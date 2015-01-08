@@ -16,9 +16,9 @@ post '/commit' do
   repo = payload['repository']['full_name']
   commits.each do |commit|
      if contains_ticket_number?(commit["message"])
-       report_status(repo, commit, 'success', "Hey, this didn't contain a ticket number")
+       report_status(repo, commit, 'success', "The commit message contained a ticket number.")
      else
-       report_status(repo, commit, 'failure', "Cool, you entered a ticket number!")
+       report_status(repo, commit, 'failure', "The commit message was missing a ticket number.")
      end
   end
 
