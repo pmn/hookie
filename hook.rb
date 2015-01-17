@@ -49,3 +49,13 @@ post '/ticket-number' do
   # Report success
   status 200
 end
+
+# Make sure a Pull Request has 2 thumbs-up
+# This responds to a PullRequestReviewCommentEvent (https://developer.github.com/v3/activity/events/types/#pullrequestreviewcommentevent)
+post '/two-thumbs-up' do
+  payload = JSON.parse(request.body.read)
+  repo = payload['repository']['full_name']
+
+  # Report success
+  status 200
+end
