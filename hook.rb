@@ -8,6 +8,24 @@ before do
   @client ||=Octokit::Client.new(:access_token => OCTOKIT_SECRET)
 end
 
+# Report the status of the commit back to the repository
+def report_status(repo, commit, status, message)
+  @client.create_status(repo, commit['id'], status, :description => message)
+end
+
+# Various test functions
+def contains_ticket_number?(message)
+  valid_tickets = ["BUG-1","BUG-2","FEATURE-3","FEATURE-4","FEATURE-5"]
+
+  re = /\[(.*?)\]/
+  match = message.match re
+
+  if match.nil?
+    false
+  else
+    valid_tickets.include? match[1]
+  end
+end
 
 # Handle a commit and make sure it has a valid ticket number
 post '/ticket-number' do
@@ -28,22 +46,4 @@ post '/ticket-number' do
 
   # Report success
   status 200
-end
-
-def contains_ticket_number?(message)
-  valid_tickets = ["BUG-1","BUG-2","FEATURE-3","FEATURE-4","FEATURE-5"]
-
-  re = /\[(.*?)\]/
-  match = message.match re
-
-  if match.nil?
-    false
-  else
-    valid_tickets.include? match[1]
-  end
-end
-
-# Report the status of the commit back to the repository
-def report_status(repo, commit, status, message)
-  @client.create_status(repo, commit['id'], status, :description => message)
 end
