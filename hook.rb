@@ -32,17 +32,17 @@ end
 post '/ticket-number' do
   payload = JSON.parse(request.body.read)
   commits = payload["commits"]
-  repo = payload['repository']['full_name']
+  repo_name = payload['repository']['full_name']
   head = payload['head_commit']
 
   # Set status to 'pending' before performing check
-  report_status(repo, head, 'pending', "Checking to see if there's a ticket number...")
+  report_status(repo_name, head, 'pending', "Checking to see if there's a ticket number...")
 
   commits.each do |commit|
      if contains_ticket_number?(commit["message"])
-       report_status(repo, commit, 'success', "The commit message contained a ticket number.")
+       report_status(repo_name, commit, 'success', "The commit message contained a ticket number.")
      else
-       report_status(repo, commit, 'failure', "The commit message was missing a ticket number.")
+       report_status(repo_name, commit, 'failure', "The commit message was missing a ticket number.")
      end
   end
 
@@ -54,7 +54,7 @@ end
 # This responds to a PullRequestReviewCommentEvent (https://developer.github.com/v3/activity/events/types/#pullrequestreviewcommentevent)
 post '/two-thumbs-up' do
   payload = JSON.parse(request.body.read)
-  repo = payload['repository']['full_name']
+  repo_name = payload['repository']['full_name']
 
   # Report success
   status 200
