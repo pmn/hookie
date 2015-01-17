@@ -10,10 +10,11 @@ end
 
 
 # Handle a commit and make sure it has a valid ticket number
-post '/commit' do
+post '/ticket-number' do
   payload = JSON.parse(request.body.read)
   commits = payload["commits"]
   repo = payload['repository']['full_name']
+
   commits.each do |commit|
      if contains_ticket_number?(commit["message"])
        report_status(repo, commit, 'success', "The commit message contained a ticket number.")
@@ -33,9 +34,9 @@ def contains_ticket_number?(message)
   match = message.match re
 
   if match.nil?
-    return false
+    false
   else
-    return valid_tickets.include? match[1]
+    valid_tickets.include? match[1]
   end
 end
 
