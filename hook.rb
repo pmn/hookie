@@ -51,11 +51,31 @@ post '/ticket-number' do
 end
 
 # Make sure a Pull Request has 2 thumbs-up
-# This responds to a PullRequestReviewCommentEvent (https://developer.github.com/v3/activity/events/types/#pullrequestreviewcommentevent)
+# This responds to an IssueCommentEvent(https://developer.github.com/v3/activity/events/types/#issuecommentevent)
 post '/two-thumbs-up' do
   payload = JSON.parse(request.body.read)
   repo_name = payload["repository"]["full_name"]
-  head =
+  issue_number = payload["issue"]["number"]
+
+  pull_request = @client.pull_request(repo_name, issue_number)
+  issue_comments = @client.issue_comments(repo_name, issue_number)
+
+  # Set status to 'pending' before performing any checks
+  report_status(repo_name, pull_request.head.sha, "pending", "Checking for thumbs-ups...")
+
+  # Check to see if there are at least 2 thumbs-up emoji in the PR comments
+  thumbs_ups = 0
+  issue_comments.each do |comment|
+    if comment.body.include?(":+1:") or comment.body.include?(":thumbsup:")
+      thumbs_ups += 1
+    end
+  end
+
+  if thumbs_ups >= 2
+    report_status(repo_name, pull_request.head.sha, "success", "This has enough approvals to merge.")
+  else
+    report_status(repo_name, pull_request.head.sha, "failure", "There are not enough thumbs-ups (2 required).")
+  end
 
   # Report success
   status 200
