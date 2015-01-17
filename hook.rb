@@ -9,8 +9,8 @@ before do
 end
 
 # Report the status of the commit back to the repository
-def report_status(repo, commit, status, message)
-  @client.create_status(repo, commit['id'], status, :description => message)
+def report_status(repo, sha, status, message)
+  @client.create_status(repo, sha, status, :description => message)
 end
 
 # Various test functions
@@ -36,13 +36,13 @@ post '/ticket-number' do
   head = payload['head_commit']
 
   # Set status to 'pending' before performing check
-  report_status(repo_name, head, 'pending', "Checking to see if there's a ticket number...")
+  report_status(repo_name, head["id"], 'pending', "Checking to see if there's a ticket number...")
 
   commits.each do |commit|
      if contains_ticket_number?(commit["message"])
-       report_status(repo_name, commit, 'success', "The commit message contained a ticket number.")
+       report_status(repo_name, commit["id"], 'success', "The commit message contained a ticket number.")
      else
-       report_status(repo_name, commit, 'failure', "The commit message was missing a ticket number.")
+       report_status(repo_name, commit["id"], 'failure', "The commit message was missing a ticket number.")
      end
   end
 
