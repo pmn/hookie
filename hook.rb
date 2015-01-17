@@ -27,14 +27,16 @@ def contains_ticket_number?(message)
   end
 end
 
-# Handle a commit and make sure it has a valid ticket number
+# Make sure a commit has a valid ticket number
+# This responds to a PushEvent (https://developer.github.com/v3/activity/events/types/#pushevent)
 post '/ticket-number' do
   payload = JSON.parse(request.body.read)
   commits = payload["commits"]
   repo = payload['repository']['full_name']
+  head = payload['head_commit']
 
   # Set status to 'pending' before performing check
-  report_status(repo, commit, 'pending', "Checking to see if there's a ticket number...")
+  report_status(repo, head, 'pending', "Checking to see if there's a ticket number...")
 
   commits.each do |commit|
      if contains_ticket_number?(commit["message"])
