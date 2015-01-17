@@ -15,6 +15,9 @@ post '/ticket-number' do
   commits = payload["commits"]
   repo = payload['repository']['full_name']
 
+  # Set status to 'pending' before performing check
+  report_status(repo, commit, 'pending', "Checking to see if there's a ticket number...")
+
   commits.each do |commit|
      if contains_ticket_number?(commit["message"])
        report_status(repo, commit, 'success', "The commit message contained a ticket number.")
