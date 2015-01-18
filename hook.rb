@@ -40,9 +40,9 @@ post '/ticket-number' do
 
   commits.each do |commit|
      if contains_ticket_number?(commit["message"])
-       report_status(repo_name, commit["id"], "success", "The commit message contained a ticket number.")
+       report_status(repo_name, head, "success", "The commit message contained a ticket number.")
      else
-       report_status(repo_name, commit['id'], "failure", "The commit message was missing a ticket number.")
+       report_status(repo_name, head, "failure", "The commit message was missing a ticket number.")
      end
   end
 
